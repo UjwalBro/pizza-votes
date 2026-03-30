@@ -2,90 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🍕 Pizza Votes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍕 Pizza Voting</title>
+
+  <!-- Supabase JS library must be loaded before any custom JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
-      background: #fff8f0;
+      margin-top: 50px;
     }
-    h1 {
-      color: #d84315;
-    }
-    .vote-btn {
-      margin: 10px;
-      padding: 15px 25px;
-      font-size: 18px;
-      background-color: #ff7043;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
       cursor: pointer;
-      transition: 0.2s;
-    }
-    .vote-btn:hover {
-      background-color: #ff5722;
     }
     #results {
       margin-top: 30px;
-      font-size: 20px;
-      color: #333;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
+
   <h1>🍕 Vote for Your Favorite Pizza!</h1>
-  <button class="vote-btn" data-choice="Margherita">Margherita</button>
-  <button class="vote-btn" data-choice="Pepperoni">Pepperoni</button>
-  <button class="vote-btn" data-choice="Veggie">Veggie</button>
+
+  <div id="buttons">
+    <button class="vote-btn" data-choice="Margherita">Margherita</button>
+    <button class="vote-btn" data-choice="Pepperoni">Pepperoni</button>
+    <button class="vote-btn" data-choice="Veggie">Veggie</button>
+  </div>
 
   <div id="results">Live Results:</div>
 
+  <!-- All custom JS must come AFTER Supabase is loaded -->
   <script>
-  const SUPABASE_URL = "https://smjpwpspsmgqidhkostt.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtanB3cHNwc21ncWlkaGtvc3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQxNjksImV4cCI6MjA5MDQ2MDE2OX0.9SeUJ9CqZCQbGoXttdhu5-9Zn4_BDwrBj9IlF-uXnqs";
+    // Initialize Supabase
+    const SUPABASE_URL = "https://smjpwpspsmgqidhkostt.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtanB3cHNwc21ncGhpZGtvc3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQxNjksImV4cCI6MjA5MDQ2MDE2OX0.9SeUJ9CqZCQbGoXttdhu5-9Zn4_BDwrBj9IlF-uXnqs";
 
-  // ✅ Correct way to initialize
-  const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ⚠️ Use capital S: Supabase.createClient (not supabase.createClient)
+    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Elements
     const buttons = document.querySelectorAll(".vote-btn");
     const resultsDiv = document.getElementById("results");
 
+    // Add vote click listeners
     buttons.forEach(button => {
       button.addEventListener("click", async () => {
         const choice = button.dataset.choice;
-        const { data, error } = await supabase.from("votes").insert([{ choice }]);
+
+        const { data, error } = await supabase
+          .from("votes")
+          .insert([{ choice }]);
 
         if (error) {
           alert("Error voting: " + error.message);
         } else {
-          fetchResults();
+          fetchResults(); // Refresh results after vote
         }
       });
     });
 
+    // Fetch live results
     async function fetchResults() {
-      const { data, error } = await supabase.from("votes").select("*");
+      const { data, error } = await supabase
+        .from("votes")
+        .select("*");
+
       if (error) {
         resultsDiv.innerHTML = "Error loading results";
-        return;
-      }
+      } else {
+        const counts = {};
+        data.forEach(v => {
+          counts[v.choice] = (counts[v.choice] || 0) + 1;
+        });
 
-      const counts = {};
-      data.forEach(v => {
-        counts[v.choice] = (counts[v.choice] || 0) + 1;
-      });
-
-      let html = "Live Results:<br>";
-      for (const [key, value] of Object.entries(counts)) {
-        html += `${key}: ${value}<br>`;
+        let html = "Live Results:<br>";
+        for (const [key, value] of Object.entries(counts)) {
+          html += `${key}: ${value}<br>`;
+        }
+        resultsDiv.innerHTML = html;
       }
-      resultsDiv.innerHTML = html;
     }
 
-    // Initial load
+    // Initial load of results
     fetchResults();
   </script>
+
 </body>
 </html>
