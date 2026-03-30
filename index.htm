@@ -2,61 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🍕 Pizza Voting</title>
-
-  <!-- 1️⃣ Supabase Client -->
+  <title>Pizza Votes</title>
+  <!-- Supabase client library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-      background-color: #fff8f0;
-    }
-    h1 { color: #d14400; }
-    button {
-      margin: 10px;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background-color: #ff6f3c;
-      color: white;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background-color: #e05a25;
-    }
-    #results {
-      margin-top: 30px;
-      font-size: 20px;
-    }
-  </style>
 </head>
 <body>
-
   <h1>🍕 Vote for Your Favorite Pizza!</h1>
 
-  <!-- 4️⃣ Buttons -->
   <button class="vote-btn" data-choice="Margherita">Margherita</button>
   <button class="vote-btn" data-choice="Pepperoni">Pepperoni</button>
   <button class="vote-btn" data-choice="Veggie">Veggie</button>
 
   <div id="results">Live Results:</div>
 
-  <!-- 2️⃣ Initialize Supabase -->
   <script>
+    // Supabase config
     const SUPABASE_URL = "https://smjpwpspsmgqidhkostt.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtanB3cHNwc21ncWlkaGtvc3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQxNjksImV4cCI6MjA5MDQ2MDE2OX0.9SeUJ9CqZCQbGoXttdhu5-9Zn4_BDwrBj9IlF-uXnqs";
 
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  </script>
 
-  <!-- 3️⃣ Vote Logic & Live Results -->
-  <script>
+    // Buttons and results div
     const buttons = document.querySelectorAll(".vote-btn");
     const resultsDiv = document.getElementById("results");
 
@@ -78,6 +44,7 @@
       });
     });
 
+    // Fetch live results
     async function fetchResults() {
       const { data, error } = await supabase
         .from("votes")
@@ -99,9 +66,8 @@
       }
     }
 
-    // Load results on page load
+    // Initial fetch
     fetchResults();
   </script>
-
 </body>
 </html>
