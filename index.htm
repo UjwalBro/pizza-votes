@@ -44,11 +44,11 @@
   <div id="results">Live Results:</div>
 
   <script>
-    // Supabase info
-    const SUPABASE_URL = "https://smjpwpspsmgqidhkostt.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtanB3cHNwc21ncWlkaGtvc3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQxNjksImV4cCI6MjA5MDQ2MDE2OX0.9SeUJ9CqZCQbGoXttdhu5-9Zn4_BDwrBj9IlF-uXnqs";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_URL = "https://smjpwpspsmgqidhkostt.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtanB3cHNwc21ncWlkaGtvc3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQxNjksImV4cCI6MjA5MDQ2MDE2OX0.9SeUJ9CqZCQbGoXttdhu5-9Zn4_BDwrBj9IlF-uXnqs";
 
+  // ✅ Correct way to initialize
+  const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const buttons = document.querySelectorAll(".vote-btn");
     const resultsDiv = document.getElementById("results");
 
