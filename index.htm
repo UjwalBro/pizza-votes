@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizza Votes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #fff5e6;
+    }
+    h1 {
+      color: #ff6f00;
+    }
+    button {
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #ffab40;
+      color: white;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: #ff9100;
+    }
+    #results {
+      margin-top: 30px;
+    }
+    .vote-count {
+      font-size: 20px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍕 Vote for Your Favorite Pizza!</h1>
+
+  <div id="buttons">
+    <button data-choice="Margherita">Margherita</button>
+    <button data-choice="Pepperoni">Pepperoni</button>
+    <button data-choice="Veggie">Veggie</button>
+  </div>
+
+  <div id="results">
+    <h2>Live Results:</h2>
+    <div id="vote-results"></div>
+  </div>
+
+  <!-- Supabase JS library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.35.1/dist/supabase.min.js"></script>
+  <script>
+    // STEP 1: Connect to Supabase
+    const SUPABASE_URL = "https://smjpwpspsmgqidhkostt.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtanB3cHNwc21ncWlkaGtvc3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4ODQxNjksImV4cCI6MjA5MDQ2MDE2OX0.9SeUJ9CqZCQbGoXttdhu5-9Zn4_BDwrBj9IlF-uXnqs";
+
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // STEP 2: Handle voting
+    const buttons = document.querySelectorAll("button[data-choice]");
+    buttons.forEach(button => {
+      button.addEventListener("click", async () => {
+        const choice = button.getAttribute("data-choice");
+        const { data, error } = await supabase
+          .from("votes")
+          .insert([{ choice }]);
+        if (error) {
+          alert("Error submitting vote: " + error.message);
+        } else {
+          alert("Vote submitted for " + choice + "!");
+          fetchVotes();
+        }
+      });
+    });
+
+    // STEP 3: Fetch live results
+    async function fetchVotes() {
+      const { data, error } = await supabase
+        .from("votes")
+        .select("choice");
+      if (error) {
+        console.error("Error fetching votes:", error);
+        return;
+      }
+      // Count votes
+      const counts = {};
+      data.forEach(vote => {
+        counts[vote.choice] = (counts[vote.choice] || 0) + 1;
+      });
+      // Display votes
+      const resultsDiv = document.getElementById("vote-results");
+      resultsDiv.innerHTML = "";
+      for (const [choice, count] of Object.entries(counts)) {
+        const div = document.createElement("div");
+        div.className = "vote-count";
+        div.textContent = `${choice}: ${count} vote(s)`;
+        resultsDiv.appendChild(div);
+      }
+    }
+
+    // Initial fetch
+    fetchVotes();
+
+    // Optional: Auto-refresh every 5 seconds
+    setInterval(fetchVotes, 5000);
+  </script>
+</body>
+</html>
